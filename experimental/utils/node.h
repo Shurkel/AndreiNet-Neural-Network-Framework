@@ -16,10 +16,10 @@ public:
     double value;
     double unactivatedValue;
     double bias = 0.0;
+    double delta = 0.0; //delta i l = dC/da il
     int id = 0;
     int layerId = 0;
-    bool yesActivate = true;
-    int activationFunction = 0;
+    int activationFunction = -1;
     
 
     
@@ -29,6 +29,7 @@ public:
     Node(double val = 0.0, double b = 0.0)
     {
         value = val;
+        unactivatedValue = val;
         bias = b;
     }
 
@@ -99,25 +100,25 @@ public:
     {
         activationFunction = function;
     }
-    void activate(int function)
+    void activate()
     {
         // * * add more functions here
         //relu
-        if (function == 0)
+        if (activationFunction == 0)
             value = u.relu(value);
         //sigmoid
-        else if (function == 1)
+        else if (activationFunction == 1)
             value = u.sigmoid(value);
         //softmax
-        else if (function == 2)
+        else if (activationFunction == 2)
             value = u.softmax(value);
     }
     void noActivate()
     {
-        if(yesActivate)
-            yesActivate = false;
+        if(activationFunction != -1)
+            activationFunction = -1;
         else
-            yesActivate = true;
+            activationFunction = 0;
     }
     
 
@@ -137,21 +138,26 @@ public:
         return next[nextNodeID].weight;
     }
 
-    void passValues()
+    void passValueTo(Node *nextNode)
+    {
+
+        //next node value = this value * weight
+        nextNode->value += value * weight(nextNode);
+        nextNode->unactivatedValue += value * weight(nextNode);
+    }
+
+    void passValueOld()
     {
         value += bias;
         unactivatedValue = value;
+        activate();
         
-        if(yesActivate)
-        {
-            //cout << "Activating node " << id << " with value " << value << "\n";
-            activate(activationFunction);
-        }    
             
         for (int i = 0; i < next.size(); i++)
         {
 
-            next[i].node->value = value*next[i].weight + next[i].node->getValue();// next node value += this value * weight 
+            next[i].node->value += value * next[i].weight;// next node value += this value * weight 
+            next[i].node->unactivatedValue = next[i].node->value;
         }
         
 
@@ -217,11 +223,11 @@ public:
         << (char)192 << " Next nodes: \n";
         if(next.size() != 0)
         {
-            cout << (char)9 << (char)218 << "Node " << next[0].node->id << " -->  weight " << next[0].weight;
+            cout << (char)9 << (char)192 << "Node " << next[0].node->id << " -->  weight " << next[0].weight;
             en
             for (int i = 1; i < next.size(); i++)
             {
-                cout << (char)9 << (char)195 << "Node " << next[i].node->id << " -->  weight " << next[i].weight;
+                cout << (char)9 << (char)195 << "Node " << next[i].node->id << " -->  weight = " << next[i].weight;
                 en
             }
         }

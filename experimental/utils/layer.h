@@ -4,8 +4,10 @@ class Layer
 {
 public:
     vector<Node> nodes;
-    bool yesActivate = true;
+    bool activationFunciton = true;
     int layerId = 0;
+    //next layer
+    Layer *next;
 
     Layer(int n)
     {
@@ -13,7 +15,6 @@ public:
         for (int i = 0; i < n; i++)
         {
             nodes.push_back(Node(0));
-            nodes[i].yesActivate = yesActivate;
         }
     }
 
@@ -96,8 +97,10 @@ public:
         }
     }
     
-    void connect(Layer *next)
+    void connect(Layer *nextL)
     {
+        next = nextL;
+        cout << "Connected layer " << layerId << " to layer " << next->layerId << endl;
         for (int i = 0; i < nodes.size(); i++)
         {
             for (int j = 0; j < next->nodes.size(); j++)
@@ -116,13 +119,33 @@ public:
             }
         }
     }
-    void passValues()
+    void passValuesOld()
     {
         for (int i = 0; i < nodes.size(); i++)
         {
-            nodes[i].passValues();
+            nodes[i].passValueOld();
 
         }
+    }
+
+    void passValues()
+    {
+        for(int j = 0; j < next->nodes.size(); j++)
+        {
+            for (int i = 0; i < nodes.size(); i++)
+            {
+                nodes[i].passValueTo(&next->nodes[j]);
+                cout << "Passed from n: " << nodes[i].getId() << " l: " << layerId << " to n: " << next->nodes[j].getId() << " l: " << next->layerId << endl;
+                cout.flush();
+                if(i == nodes.size() - 1)
+                {
+                    nodes[i].next[j].node->value += nodes[i].next[j].node->bias;
+                    nodes[i].next[j].node->unactivatedValue = nodes[i].next[j].node->value;
+                    nodes[i].next[j].node->activate();
+                }
+            }
+        }
+        
     }
 
     void printLayer()
