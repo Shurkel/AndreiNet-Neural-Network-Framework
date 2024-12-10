@@ -110,7 +110,7 @@ void displayMenu()
          << YELLOW << ">>> " << RESET;
 }
 
-void runDemo()
+void runDemo(int param)
 {
     cout << BOLDGREEN << "\n[+]INIT DEMO2" << RESET;
 
@@ -124,8 +124,8 @@ void runDemo()
 
     // Aktivierungsfunktionen für die layeren festlegen
     n.noActivate(0);     // Eingangs-layer deaktivieren
-    n.setActivate(1, 1); // ReLU-Aktivierung für die versteckte Layer festlegen
-    n.setActivate(2, 1); // Sigmoid-Aktivierung für die Ausgangs-layer festlegen
+    n.setActivate(1, 1); 
+    n.setActivate(2, 1); 
 
 
     // Gewichte und Bias initialisieren
@@ -247,11 +247,13 @@ void runDemo()
                     cout
                 << BOLDCYAN << "\n[+]TRAINIERE NETZ(-1 EXIT)" << RESET << "\n";
             cout << YELLOW << "[?] WIE VIELE EPOCHS: ";
-            cin >> epochs;
+            //cin >> epochs;
+            epochs = 1000;
             if (epochs == -1)
                 continue;
             cout << YELLOW << "[?] LERNRATE: ";
-            cin >> learningRate;
+            //cin >> learningRate;
+            learningRate = 0.01;
             if (learningRate == -1)
                 continue;
             cout << RESET;
@@ -261,7 +263,8 @@ void runDemo()
             chrono::duration<float> duration;
             startTime = chrono::high_resolution_clock::now();
 
-            n.backPropagate_old(trainingData, epochs, learningRate);
+            
+                n.backPropagate_new(trainingData, epochs, learningRate);
 
             endTime = chrono::high_resolution_clock::now();
             duration = endTime - startTime;

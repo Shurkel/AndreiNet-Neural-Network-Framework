@@ -17,7 +17,7 @@ public:
     {
         return 1 / (1 + exp(-x));
     }
-    double softmax(double x)
+    double softplus(double x)
     {
         //f(x) = log(1 + e^x)
         return log(1 + exp(x));
@@ -37,7 +37,10 @@ public:
     {
         return sigmoid(x) * (1 - sigmoid(x));
     }
-    
+    double dsoftplus(double x)
+    {
+        return 1 / (1 + exp(-x));
+    }
     double randomDouble(double fMin, double fMax)
     {
         double f = (double)rand() / RAND_MAX;

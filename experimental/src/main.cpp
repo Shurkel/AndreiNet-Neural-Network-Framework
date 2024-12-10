@@ -12,8 +12,11 @@ int main()
 {
     
 
+    //1 old
+    //2 new
 
-    
-    
-    runDemo(); 
+
+
+    runDemo(1);
+ 
 }

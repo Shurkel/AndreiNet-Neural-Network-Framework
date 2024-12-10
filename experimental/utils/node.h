@@ -100,18 +100,36 @@ public:
     {
         activationFunction = function;
     }
-    void activate()
+    double activate(double in, bool deriv=false)
     {
         // * * add more functions here
         //relu
         if (activationFunction == 0)
-            value = u.relu(value);
+        {
+            if(deriv)
+                return u.drelu(in);
+            return u.relu(in);
+        }
         //sigmoid
         else if (activationFunction == 1)
-            value = u.sigmoid(value);
+        {
+            if(deriv)
+                return u.dsigmoid(in);
+            return u.sigmoid(in);
+        }
         //softmax
         else if (activationFunction == 2)
-            value = u.softmax(value);
+        {
+            if(deriv)
+                return u.dsoftplus(in);
+            return u.softplus(in);
+        }
+        else if (activationFunction == -1)
+        {
+            if(deriv)
+                return 1;
+            return in;
+        }
     }
     void noActivate()
     {
@@ -150,7 +168,7 @@ public:
     {
         value += bias;
         unactivatedValue = value;
-        activate();
+        value = activate(value);
         
             
         for (int i = 0; i < next.size(); i++)

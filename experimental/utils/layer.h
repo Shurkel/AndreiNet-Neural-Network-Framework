@@ -135,13 +135,13 @@ public:
             for (int i = 0; i < nodes.size(); i++)
             {
                 nodes[i].passValueTo(&next->nodes[j]);
-                cout << "Passed from n: " << nodes[i].getId() << " l: " << layerId << " to n: " << next->nodes[j].getId() << " l: " << next->layerId << endl;
-                cout.flush();
+                //cout << "Passed from n: " << nodes[i].getId() << " l: " << layerId << " to n: " << next->nodes[j].getId() << " l: " << next->layerId << endl;
+                //cout.flush();
                 if(i == nodes.size() - 1)
                 {
                     nodes[i].next[j].node->value += nodes[i].next[j].node->bias;
                     nodes[i].next[j].node->unactivatedValue = nodes[i].next[j].node->value;
-                    nodes[i].next[j].node->activate();
+                    nodes[i].next[j].node->value = nodes[i].next[j].node->activate(nodes[i].next[j].node->value);
                 }
             }
         }
