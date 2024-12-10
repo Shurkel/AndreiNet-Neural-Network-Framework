@@ -1,5 +1,9 @@
 #include "layer.h"
+#include <iostream> // Add this include for std::cout
+#include <fstream> // Add this include for std::ofstream
 
+
+    std::ofstream tst("test.txt");
 class net
 {
 public:
@@ -12,7 +16,7 @@ public:
     //derivate von SSR
     double dSSR = 0.0;
 
-
+    net(){}
     net(vector<int> layerSizes)
     {
         
@@ -418,6 +422,13 @@ public:
                 setExpected({trainingData.second[j]});
                 passValues();
                 getSSR();
+                if(j == 0)
+                    tst << SSR << endl;
+                if (i % 500 == 0 && j == 3)
+                {   
+                    std::cout << "Epoch " << i << ", SSR for 4th element: " << SSR << std::endl;
+                }
+            
                 double stepSize = 0.0;
                 double dSSR_dn7 = (layers.back().nodes[0].value - expected[0]);
                 
@@ -480,70 +491,89 @@ public:
     }
     
 
-    void backPropagate_new(pair<vector< pair<double, double>>,vector<double>> trainingData, int epochs, double learningRate)
+    void backPropagate_new(pair<vector<pair<double, double>>, vector<double>> trainingData, int epochs, double learningRate)
+{
+    int counter = 0;
+
+    for (int e = 0; e < epochs; e++)
     {
-        int counter = 0;
-        for(int e = 0; e < epochs; e++)
+        clearSSR();
+        
+        for (int t = 0; t < trainingData.first.size(); t++)
         {
-            clearSSR();
-            
-            for(int t = 0; t < trainingData.first.size(); t++)
+            clean();
+            setInputFromVector(trainingData.first[t]);
+            setExpected({trainingData.second[t]});
+            passValues();
+
+            getSSR();
+            if(t == 0)
+                tst << SSR << endl;
+            // Print SSR value every 500th epoch for the 4th element in the training data
+            if (e % 500 == 0 && t == 3)
             {
-                clean();
-                setInputFromVector(trainingData.first[t]);
-                setExpected({trainingData.second[t]});
-                passValues();
-                getSSR();
-                
-                double stepSize = 0.0;
-                // Calculate delta for each node
-                // Last layer
-                for(int i = 0; i < layers.back().nodes.size(); i++)
+                std::cout << "Epoch " << e << ", SSR for 4th element: " << SSR << std::endl;
+            }
+            
+
+            // Output layer delta calculation
+            for (int i = 0; i < layers.back().nodes.size(); i++)
+            {
+                double error = layers.back().nodes[i].value - expected[i];
+                double activationDerivative = layers.back().nodes[i].activate(layers.back().nodes[i].unactivatedValue, true);
+                layers.back().nodes[i].delta = error * activationDerivative;
+            }
+
+            // Hidden layers delta calculation (backpropagation)
+            for (int k = layers.size() - 2; k >= 0; k--) // Iterate from last hidden layer to first
+            {
+                for (int j = 0; j < layers[k].nodes.size(); j++) // Iterate over nodes in layer k
                 {
-                    double delta = (layers.back().nodes[i].value - expected[i]) * layers.back().nodes[i].activate(layers.back().nodes[i].unactivatedValue, true);
-                    layers.back().nodes[i].delta = delta;
-                }
-                // Hidden layers
-                for(int k = layers.size() - 2; k > 0; k--)
-                {
-                    for(int j = 0; j < layers[k].nodes.size(); j++)
+                    double sum = 0.0;
+                    for (int i = 0; i < layers[k + 1].nodes.size(); i++) // Iterate over nodes in the next layer (k+1)
                     {
-                        double sum = 0.0;
-                        for(int i = 0; i < layers[k + 1].nodes.size(); i++)
-                        {
-                            sum += layers[k + 1].nodes[i].delta * weight(k, j, k + 1, i);
-                        }
-                        layers[k].nodes[j].delta = sum * layers[k].nodes[j].activate(layers[k].nodes[j].unactivatedValue, true);
+                        sum += layers[k + 1].nodes[i].delta * weight(k, j, k + 1, i);
                     }
+
+                    // Apply the derivative of the activation function for the current node in layer k
+                    layers[k].nodes[j].delta = sum * layers[k].nodes[j].activate(layers[k].nodes[j].unactivatedValue, true);
                 }
-                // Update weights
-                // Last layer
-                for(int j = 0; j < layers[layers.size() - 2].nodes.size(); j++)
+            }
+
+            // Update weights from hidden layer to output layer
+            for (int j = 0; j < layers[layers.size() - 2].nodes.size(); j++) // For each node in second to last layer
+            {
+                for (int i = 0; i < layers.back().nodes.size(); i++) // For each node in the output layer
                 {
-                    for(int i = 0; i < layers.back().nodes.size(); i++)
-                    {
-                        double delta = layers.back().nodes[i].delta;
-                        double value = layers[layers.size() - 2].nodes[j].value;
-                        stepSize = delta * value * learningRate;
-                        layers[layers.size() - 2].nodes[j].next[i].weight -= stepSize;
-                    }
+                    double delta = layers.back().nodes[i].delta;
+                    double value = layers[layers.size() - 2].nodes[j].value;
+                    double stepSize = delta * value * learningRate;
+
+                    // Update the weight between the current node and the output node
+                    layers[layers.size() - 2].nodes[j].next[i].weight -= stepSize;
                 }
-                // Hidden layers
-                for(int k = layers.size() - 2; k > 0; k--)
+            }
+
+            // Update weights between hidden layers
+            for (int k = layers.size() - 2; k > 0; k--) // Iterate from second-to-last hidden layer back to first hidden layer
+            {
+                for (int j = 0; j < layers[k - 1].nodes.size(); j++) // Iterate over nodes in the previous layer (k-1)
                 {
-                    for(int j = 0; j < layers[k - 1].nodes.size(); j++)
+                    for (int i = 0; i < layers[k].nodes.size(); i++) // Iterate over nodes in the current layer (k)
                     {
-                        for(int i = 0; i < layers[k].nodes.size(); i++)
-                        {
-                            double delta = layers[k].nodes[i].delta;
-                            double value = layers[k - 1].nodes[j].value;
-                            stepSize = delta * value * learningRate;
-                            layers[k - 1].nodes[j].next[i].weight -= stepSize;
-                        }
+                        double delta = layers[k].nodes[i].delta;
+                        double value = layers[k - 1].nodes[j].value;
+                        double stepSize = delta * value * learningRate;
+
+                        // Update the weight between the nodes from layer k-1 to layer k
+                        layers[k - 1].nodes[j].next[i].weight -= stepSize;
                     }
                 }
             }
         }
     }
+}
+
+
 
 };

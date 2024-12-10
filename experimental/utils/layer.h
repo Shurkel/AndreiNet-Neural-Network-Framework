@@ -100,7 +100,6 @@ public:
     void connect(Layer *nextL)
     {
         next = nextL;
-        cout << "Connected layer " << layerId << " to layer " << next->layerId << endl;
         for (int i = 0; i < nodes.size(); i++)
         {
             for (int j = 0; j < next->nodes.size(); j++)

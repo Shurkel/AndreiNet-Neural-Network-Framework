@@ -67,6 +67,7 @@ public:
     void clean()
     {
         value = 0;
+        unactivatedValue = 0;
     }
     
     double weight(int nextNodeID)

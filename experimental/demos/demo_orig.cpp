@@ -248,12 +248,12 @@ void runDemo(int param)
                 << BOLDCYAN << "\n[+]TRAINIERE NETZ(-1 EXIT)" << RESET << "\n";
             cout << YELLOW << "[?] WIE VIELE EPOCHS: ";
             //cin >> epochs;
-            epochs = 1000;
+            epochs = 10000;
             if (epochs == -1)
                 continue;
             cout << YELLOW << "[?] LERNRATE: ";
             //cin >> learningRate;
-            learningRate = 0.01;
+            learningRate = 0.06;
             if (learningRate == -1)
                 continue;
             cout << RESET;
@@ -263,8 +263,18 @@ void runDemo(int param)
             chrono::duration<float> duration;
             startTime = chrono::high_resolution_clock::now();
 
-            
-                n.backPropagate_new(trainingData, epochs, learningRate);
+            //new 0.181516
+            //old 0.181528
+
+
+            //old 0.127622
+            //new 0.121361
+
+
+            //NEW 0.0856481
+            //OLD 0.0856156
+            cout << "old" << endl;
+                n.backPropagate_old(trainingData, epochs, learningRate);
 
             endTime = chrono::high_resolution_clock::now();
             duration = endTime - startTime;
