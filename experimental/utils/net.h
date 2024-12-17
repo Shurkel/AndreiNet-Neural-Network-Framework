@@ -3,7 +3,7 @@
 #include <fstream> // Add this include for std::ofstream
 
 
-    std::ofstream tst("test.txt");
+std::ofstream tst("test.txt");
 class net
 {
 public:
@@ -14,7 +14,7 @@ public:
     //sum of squared residuals
     double SSR = 0.0;
     //derivate von SSR
-    double dSSR = 0.0;
+
 
     net(){}
     net(vector<int> layerSizes)
@@ -37,7 +37,7 @@ public:
             layers[i].clean();
         }
     }
-
+    
     void clean(int i)
     {
         for(int i = 0; i < layers.size(); i++)
@@ -104,7 +104,6 @@ public:
     void clearSSR()
     {
         SSR = 0.0;
-        dSSR = 0.0;
     }
     
     void printInput()
@@ -161,9 +160,9 @@ public:
         layers[layerId].setValue(nodeId, val);
     }
     
-    void setInputFromVector(pair<double, double> values)
+    void setInputFromVector(vector<double> values)
     {
-        layers[0].setValueFromVector({values.first, values.second});
+        layers[0].setValueFromVector(values);
     }
     
     void setBiasAll(int layerId, double w)
@@ -340,7 +339,7 @@ public:
         cout << MAGENTA << "\n    [+]SSR: " << SSR << RESET;
         cout.flush();}
 
-    void testNet(pair<vector< pair<double, double>>,vector<double>> trainingData, bool brief)
+    void testNet(pair<vector<pair<double,double>>,vector<double>> trainingData, bool brief)
     {
         clearSSR();
         
@@ -349,7 +348,7 @@ public:
         {
             
             clean();
-            setInputFromVector(trainingData.first[i]);
+            setInputFromVector({trainingData.first[i].first, trainingData.first[i].second});
             setExpected({trainingData.second[i]});
             passValues();
             getSSR();
@@ -409,7 +408,7 @@ public:
         setBiasAll(0);  
     }
 
-    void backPropagate_old(pair<vector< pair<double, double>>,vector<double>> trainingData, int epochs, double learningRate)
+    void backPropagate_old(pair<vector<double>,vector<double>> trainingData, int epochs, double learningRate)
     {
         int counter = 0;
         for(int i = 0; i < epochs; i++)
@@ -418,7 +417,7 @@ public:
             for(int j = 0; j < trainingData.first.size(); j++)
             {
                 clean();
-                setInputFromVector(trainingData.first[j]);
+                setInputFromVector(trainingData.first);
                 setExpected({trainingData.second[j]});
                 passValues();
                 getSSR();
@@ -502,12 +501,12 @@ public:
         for (int t = 0; t < trainingData.first.size(); t++)
         {
             clean();
-            setInputFromVector(trainingData.first[t]);
+            setInputFromVector({trainingData.first[t].first, trainingData.first[t].second});
             setExpected({trainingData.second[t]});
             passValues();
 
             getSSR();
-            if(t == 0)
+            if(t == 0 && e != 0)
                 tst << SSR << endl;
             // Print SSR value every 500th epoch for the 4th element in the training data
             if (e % 500 == 0 && t == 3)
@@ -519,7 +518,7 @@ public:
             // Output layer delta calculation
             for (int i = 0; i < layers.back().nodes.size(); i++)
             {
-                double error = layers.back().nodes[i].value - expected[i];
+                double error = layers.back().nodes[i].value - expected[i]; //SSR
                 double activationDerivative = layers.back().nodes[i].activate(layers.back().nodes[i].unactivatedValue, true);
                 layers.back().nodes[i].delta = error * activationDerivative;
             }
@@ -540,7 +539,7 @@ public:
                 }
             }
 
-            // Update weights from hidden layer to output layer
+            // Update weights and biases from hidden layer to output layer
             for (int j = 0; j < layers[layers.size() - 2].nodes.size(); j++) // For each node in second to last layer
             {
                 for (int i = 0; i < layers.back().nodes.size(); i++) // For each node in the output layer
@@ -551,10 +550,13 @@ public:
 
                     // Update the weight between the current node and the output node
                     layers[layers.size() - 2].nodes[j].next[i].weight -= stepSize;
+
+                    // Update the bias for the output node
+                    layers.back().nodes[i].bias -= delta * learningRate;
                 }
             }
 
-            // Update weights between hidden layers
+            // Update weights and biases between hidden layers
             for (int k = layers.size() - 2; k > 0; k--) // Iterate from second-to-last hidden layer back to first hidden layer
             {
                 for (int j = 0; j < layers[k - 1].nodes.size(); j++) // Iterate over nodes in the previous layer (k-1)
@@ -567,13 +569,14 @@ public:
 
                         // Update the weight between the nodes from layer k-1 to layer k
                         layers[k - 1].nodes[j].next[i].weight -= stepSize;
+
+                        // Update the bias for the current node in layer k
+                        layers[k].nodes[i].bias -= delta * learningRate;
                     }
                 }
             }
         }
     }
 }
-
-
 
 };

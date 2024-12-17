@@ -24,7 +24,7 @@ def plot_ssr_progress(epochs, ssr_values):
     plt.figure(figsize=(8, 6))
 
     # Plotting SSR over epochs
-    plt.plot(epochs, ssr_values, marker='o', linestyle='-', color='b', label='SSR')
+    plt.plot(epochs, ssr_values, marker='o', linestyle='-', color='b', label='SSR', markersize=2)
     
     plt.xlabel('Epochs')
     plt.ylabel('SSR (Sum of Squared Residues)')

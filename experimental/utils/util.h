@@ -1,4 +1,5 @@
 #include "includes.h"
+
 class util
 {
 public:
@@ -47,8 +48,20 @@ public:
         return fMin + f * (fMax - fMin);
     }
     
-    double normalize(double value, double minVal, double maxVal) {
-        return (value - minVal) / (maxVal - minVal);
+    vector<double> softMax(vector<double> x)
+    {
+        vector<double> y;
+        double sum = 0;
+        for (int i = 0; i < x.size(); i++)
+        {
+            sum += exp(x[i]);
+        }
+        for (int i = 0; i < x.size(); i++)
+        {
+            y.push_back(exp(x[i]) / sum);
+        }
+        return y;
     }
+    
 
 } u;

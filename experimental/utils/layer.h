@@ -34,7 +34,15 @@ public:
             nodes[i].clean();
         }
     }
-
+    vector<double> getValues()
+    {
+        vector<double> values;
+        for (int i = 0; i < nodes.size(); i++)
+        {
+            values.push_back(nodes[i].getValue());
+        }
+        return values;
+    }
     void setValueFromVector(vector<double> values)
     {
         for (int i = 0; i < nodes.size(); i++)
@@ -117,6 +125,10 @@ public:
                 nodes[i].disconnect(&next->nodes[j]);
             }
         }
+    }
+    void softMaxLayer()
+    {
+        setValueFromVector(u.softMax(getValues()));
     }
     void passValuesOld()
     {

@@ -1,7 +1,7 @@
 #include "../utils/andreinet.h"
 #include <fstream>
 
-net n({2, 4, 1});
+net n({2, 10, 5, 5, 1});
 
 void saveWeights()
 {
@@ -281,8 +281,8 @@ int main()
 
     
 
-    int epochs = 100;
-    double learningRate = 0.005;
+    int epochs = 500;
+    double learningRate = 0.25;
     
     n.backPropagate_new(trainingData, epochs, learningRate);
     //n.backPropagate_old(trainingData, epochs, learningRate); 
