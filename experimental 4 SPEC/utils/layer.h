@@ -10,7 +10,7 @@ public:
 
     // * CONSTRUCTORS
     Layer () {}
-    Layer(int n)
+    Layer(int n, int layerId = 0)
     {
         for (int i = 0; i < n; i++)
             nodes.push_back(Node(i, layerId));
@@ -66,13 +66,7 @@ public:
 
     //ID
     int getId() { return layerId; }
-    void setId(int id)
-    {
-        layerId = id;
-        for (int i = 0; i < nodes.size(); i++)
-            nodes[i].setId(i);
-
-    }
+    void setId(int id) { layerId = id; }
 
     //ACTIVATION FUNCTION
     void setActivationFunction(int function)

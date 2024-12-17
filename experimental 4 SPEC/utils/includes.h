@@ -7,6 +7,8 @@
 #include <cstdlib>
 #include "TextTable.h"
 #include <string>
+#include <fstream>
+
 
 using namespace std;
 

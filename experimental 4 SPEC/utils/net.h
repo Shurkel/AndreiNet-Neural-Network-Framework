@@ -1,24 +1,21 @@
 #include "layer.h"
 #include "data.h"
 
-std::ofstream tst("test.txt");
+// ! fix
+ofstream tst("test.txt");
 class net
 {
 public:
     vector<Layer> layers;
     
-    data trainingData;
+    //data trainingData;
     vector<double> costs;
-
 
     net(){}
     net(vector<int> layerSizes)
     {
         for (auto i : layerSizes)
-        {
-            layers.push_back(Layer(layerSizes[i])); // Create the layer first
-            layers[i].setIdAll(i);   
-        }   
+            layers.push_back(Layer(layerSizes[i], i)); // Create the layer first 
         connectLayers();
         clearCosts();
     }

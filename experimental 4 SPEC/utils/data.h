@@ -1,13 +1,12 @@
-#include "net.h"
-
+#include "includes.h"
 class data
 {
-public:
+private:
     vector<double> inputs;
     vector<double> outputs;
     vector<double> expected;
 
-
+public:
     data() {}
     data(vector<double> inputs, vector<double> outputs, vector<double> expected) : inputs(inputs), outputs(outputs), expected(expected) {}
 
