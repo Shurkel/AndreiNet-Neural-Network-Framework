@@ -1,7 +1,7 @@
 #include "node.h"
 
 class Layer
-{
+{// ? DONE 12/24/24
 public:
     vector<Node> nodes;
     int layerId = 0;

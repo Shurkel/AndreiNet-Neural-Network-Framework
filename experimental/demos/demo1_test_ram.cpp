@@ -34,22 +34,20 @@ int main()
 {
     //system("cls");
     t.start();
-    net n({10000, 1000, 10002, 1950, 8192});//55.4803mil weights, 965.25 MB
+    cout << "Starting..." << endl;
+    net n({10000, 50000, 10000, 10000, 10000});//55.4803mil weights, 965.25 MB
     //nr of weights
-    
-    n.connectLayers();
-    int w = 0;
-    for (size_t i = 0; i < n.layers.size() - 1; ++i) {
-        w += n.layers[i].nodes.size() * n.layers[i + 1].nodes.size();
+    cout << "Counting params..." << endl;
+    int p = 0;
+    for (int i = 0; i < n.layers.size() - 1; i++) {
+        p += n.layers[i].nodes.size() * n.layers[i + 1].nodes.size();
     }
-    
-    cout << "Nr of weights: " << (double)w/1000000 << "mil" << endl;
     // Usage
     size_t networkSize = getNetworkSize(n);
     //in mb
     cout << "Size of the network: " << (double)networkSize / 1024 / 1024 << " MB" << endl;
     
-    t.stop();
+    t.stop(0);
     //cin.get();
     //comp per sec
     //convert t.duration to double std::chrono::duration<double>(d).count()

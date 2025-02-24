@@ -8,8 +8,9 @@ class net
 public:
     vector<Layer> layers;
     
-    //data trainingData;
+    dataSet trainingData();
     vector<double> costs;
+    double SSR = 0.0;
 
     net(){}
     net(vector<int> layerSizes)
@@ -19,190 +20,124 @@ public:
         connectLayers();
         clearCosts();
     }
-    void clean()
-    {
-        for(int i = 0; i < layers.size(); i++)
-        {
-            layers[i].clean();
-        }
+    
+    
+    
+    void clean(int i = -1)
+    {   
+        if(i == -1)
+            for(int j = 0; j < layers.size(); j++)
+                layers[j].clean();
+        else
+            for(int j = 0; j < layers[i].nodes.size() && j != i; j++)
+                layers[j].clean();
     }
     
-    void clean(int i)
-    {
-        for(int i = 0; i < layers.size(); i++)
-        {
-            if(layers[i].layerId == 0)
-                continue;
-            layers[i].clean();
-        }
-    }
     
-    double weight(int layerId, int nodeId, int nextLayerId, int nextNodeId)
-    {
-        return layers[layerId].nodes[nodeId].weight(&layers[nextLayerId].nodes[nextNodeId]);
-    }
-    
-    double weight(Node *node, Node *nextNode)
-    {
-        return node->weight(nextNode);
-    }
 
-    void setExpected(vector<double> expectedValues)
-    {
-        expected.clear();
-        for (int i = 0; i < layers.back().nodes.size(); i++)
-        {
-            expected.push_back(expectedValues[i]);
-        }
-    }
+    void setExpected(vector<double> expectedValues) { trainingData().setExpected(expectedValues); }
     
-    void getCosts()
+    void updateCosts()
     {
         costs.clear();
-        if (expected.empty())
+        if (trainingData().getExpected().size() == 0)
         {
             cerr << (char)218 << "[x] Error: Costs vector is empty.\n"
             << (char)192 << "Please use setExpected() before calling getCosts().\n";
             return;
         }
         for(int i = 0; i < layers.back().nodes.size(); i++)
-        {
-            costs.push_back(layers.back().nodes[i].value - expected[i]);
-        }
-        
-    }
-    
-    void getSSR()
-    {
-        clearCosts();
-        getCosts();
-        for (int i = 0; i < costs.size(); i++)
-        {
-            SSR += pow(costs[i], 2);
-        }
-        SSR*=0.5;
-        
-        
+            costs.push_back(layers.back().nodes[i].getValue() - trainingData().getExpected()[i]);
     }
 
-    void clearCosts()
+    vector<double> getCosts() { return costs; }
+
+    void setSSR(double ssr) { SSR = ssr; }
+
+    double getSSR() { return SSR; }
+
+    void updateSSR()
     {
-        costs.clear();
+        clearCosts();
+        updateCosts();
+        
+        for (int i = 0; i < costs.size(); i++)
+            setSSR(getSSR() + pow(getCosts()[i], 2));
+        SSR *= 0.5;
     }
+
+    void clearCosts() { costs.clear(); }
     
-    void clearSSR()
-    {
-        SSR = 0.0;
-    }
+    void resetCosts() { clearCosts(); }
+    void resetSSR() { setSSR(0.0); }
     
-    void printInput()
-    {
-        cout << "\n[+]Input: ";
-        for (int i = 0; i < layers[0].nodes.size(); i++)
-        {
-            cout << layers[0].nodes[i].value << " ";
-        }
-        cout.flush();
-    }
 
     void printCosts()
     {
-        cout << MAGENTA << "\n    [+]Costs: ";
+        cout  << "[+]Costs: ";
         for (int i = 0; i < costs.size(); i++)
-        {
             cout << costs[i] << " ";
-        }
-        cout << RESET;
-        cout.flush();
+        en
     }
     
-    void printExpected()
-    {
-        cout << "\n[+]Expected: ";
-        for (int i = 0; i < expected.size(); i++)
-        {
-            cout << expected[i] << " ";
-        }
-        cout.flush();
-    }
+
 
     void printActualOutput()
     {
-        cout << "\n[+]Actual output: ";
+        cout << "[+]Actual output: ";
         for (int i = 0; i < layers.back().nodes.size(); i++)
-        {
-            cout << layers.back().nodes[i].value << " ";
-        }
-        cout.flush();
+            cout << layers.back().nodes[i].getValue() << " ";
+        en
     }
     
-    void setValueAll( double val)
+    void setInputData(vector<double> data)
+    {
+        trainingData().setInputs(data);
+    }
+
+    void setInput(int i)
+    {
+        if(trainingData().getInputs().size() == 0)
+        {
+            cerr << (char)218 << "[x] Error: Inputs vector is empty.\n"
+            << (char)192 << "Please use setInputData() before calling setInput().\n";
+            return;
+        }
+        layers[0].setValues(trainingData().getInput(i));
+    }
+    
+    void setBias(double b)
+    {
+        for(int i = 0; i < layers.size(); i++)
+            layers[i].setBias(b);
+    }
+
+    void setActivationFunction(int function)
     {
         for (int i = 0; i < layers.size(); i++)
-        {
-            layers[i].setValueAll(val);
-        }
-    }
-    
-    void setValue(int layerId, int nodeId, double val)
-    {
-        layers[layerId].setValue(nodeId, val);
-    }
-    
-    void setInputFromVector(vector<double> values)
-    {
-        layers[0].setValueFromVector(values);
-    }
-    
-    void setBiasAll(int layerId, double w)
-    {
-        layers[layerId].setBiasAll(w);
+            layers[i].setActivationFunction(function);
     }
 
-    void setIdAll(int layerId, int id)
-    {
-        layers[layerId].setIdAll(id);
-    }
 
-    void setActivateAll(int function)
+    void noActivate()
     {
         for (int i = 0; i < layers.size(); i++)
-        {
-            layers[i].setActivateAll(function);
-        }
-    }
-
-    void noActivate(int layerId, int nodeId)
-    {
-        layers[layerId].noActivate(nodeId);
-    }
-    void noActivate(int layerId)
-    {
-        for(int i = 0; i < layers[layerId].nodes.size(); i++)
-        {
-            layers[layerId].noActivate(i);
-        }
-    }
-
-    void noActivateAll()
-    {
-        for (int i = 0; i < layers.size(); i++)
-        {
             layers[i].noActivateAll();
-        }
     }
 
     void setActivate(int layerId, int function)
     {
-        layers[layerId].setActivate(function);
+        layers[layerId].setActivationFunction(function);
     }
 
-    void printLayer(int id)
+    void reset(int i = -1)
     {
-        layers[id].printLayer();
+        clean(i);
+        resetCosts();
+        resetSSR();
     }
 
-    void printNet()
+    void print()
     {
         cout << (char)218 << "Layer count: " << layers.size() << '\n';
         cout << (char)195 << "SSR: " << SSR << '\n';
@@ -219,27 +154,15 @@ public:
 
         cout << char(192);
         cout << "  " << layers.back().layerId << "   |    " << layers.back().nodes.size();
-        cout.flush();
+        flush
         
     }
     
     void printLayers()
     {
         for (int i = 0; i < layers.size(); i++)
-        {
             layers[i].printLayer();
-        }
-    }
-
-    void setWeight(int layerID, int nodeID, int nextLayerID, int nextNodeID, double w)
-    {
-        layers[layerID].nodes[nodeID].setWeight(nextNodeID, nextLayerID, w);
-    }
-
-    void setBias(int layerID, int nodeID, double b)
-    {
-        layers[layerID].nodes[nodeID].setBias(b);
-    }   
+    } 
     
     void printNextNodes(int layerId, int nodeId)
     {
@@ -249,61 +172,24 @@ public:
     void connectLayers()
     {
         for (int i = 0; i < layers.size() - 1; i++)
-        {
             layers[i].connect(&layers[i + 1]);
-            layers[i].next = &layers[i + 1];
-        }
     }
     void disconnectLayers()
     {
         for (int i = 0; i < layers.size() - 1; i++)
-        {
             layers[i].disconnect(&layers[i + 1]);
-        }
     }
-    void passValuesOld()
-    {
-        for (int i = 0; i < layers.size(); i++)
-        {
-            layers[i].passValuesOld();
-            //cout layer with size passed values
-            cout << "Layer " << i << " with size " << layers[i].nodes.size() << " passed values\n";
-        }
-            
 
-    }
     void passValues()
     {
         for (int i = 0; i < layers.size()-1; i++)
-        {
             layers[i].passValues();
-            //cout layer with size passed values
-            //cout << "Layer " << i << " with size " << layers[i].nodes.size() << " passed values\n";
-        }
-            
-
     }
 
-    void setWeightAll(double w)
+    void setWeight(double w)
     {
         for (int i = 0; i < layers.size(); i++)
-        {
-            for (int j = 0; j < layers[i].nodes.size(); j++)
-            {
-                layers[i].nodes[j].setWeightAll(w);
-            }
-        }
-    }
-
-    void setBiasAll(double b)
-    {
-        for (int i = 0; i < layers.size(); i++)
-        {
-            for (int j = 0; j < layers[i].nodes.size(); j++)
-            {
-                layers[i].nodes[j].setBias(b);
-            }
-        }
+                layers[i].setWeight(w);
     }
 
     void ranomiseAllWeights()
@@ -320,24 +206,21 @@ public:
     
     void printNodeDetails(int nodeId, int layerId)
     {
-        layers[layerId].nodes[nodeId].printDetails();
+        layers[layerId].nodes[nodeId].print();
     }
 
     void printSSR()
     {
-        cout << MAGENTA << "\n    [+]SSR: " << SSR << RESET;
-        cout.flush();}
+        cout << "[+]SSR: " << SSR;
+        en flush
+    }
 
-    void testNet(pair<vector<double>,vector<double>> trainingData, bool brief)
+    void testNet()
     {
-        clearSSR();
-        
-        //go trough all the training data and calculate the SSR
-        for(int i = 0; i < trainingData.first.size(); i++)
+        for(int i = 0; i < trainingData().getInputs().size(); i++)
         {
-            
-            clean();
-            setInputFromVector(trainingData.first);
+            reset();
+            setInput(trainingData.first);
             setExpected({trainingData.second[i]});
             passValues();
             getSSR();
