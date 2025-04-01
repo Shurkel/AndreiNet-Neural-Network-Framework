@@ -1,1 +1,0 @@
-<< YELLOW << "\n[ENTER]" << RESET << " um fortzufahren";

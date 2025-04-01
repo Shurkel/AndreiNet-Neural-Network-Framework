@@ -1,5 +1,8 @@
 /.vscode
-main.exe
-main.exe
 logs/
-/experimental5/
+*.exe
+./others/
+andreiNet 1.1/experimental/output
+.VSCodeCounter/
+andreiNet 1.1/python_sim_test/
+
