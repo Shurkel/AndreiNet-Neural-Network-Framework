@@ -371,8 +371,7 @@ void saveNetworkState(const net& network, int epoch, const std::string& prefix) 
 }
 
 // Function to save the dataset for visualization
-void saveDataset(const std::pair<std::vector<std::pair<double, double>>, std::vector<double>>& dataset, 
-                 const std::string& filename) {
+void saveDataset(const std::pair<std::vector<std::pair<double, double>>, std::vector<double>>& dataset, const std::string& filename) {
     std::ofstream file("output/data/" + filename);
     
     if (!file.is_open()) {
@@ -441,7 +440,7 @@ int main() {
     createOutputDirectories();
     
     // Choose dataset type: 1 = spiral, 2 = moons, 3 = circles, 4 = checkerboard, 5 = multi-spiral
-    int datasetType = 4;
+    int datasetType = 1;
     std::pair<std::vector<std::pair<double, double>>, std::vector<double>> dataset;
     
     switch (datasetType) {

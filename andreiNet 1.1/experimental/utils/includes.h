@@ -20,6 +20,8 @@ using namespace std;
 #define cls system("cls");
 #define test cout << "test\n";
 
+#define M_PI 3.14159265358979323846
+
 #define tab cout << (char)9;
 //https://stackoverflow.com/questions/9158150/colored-output-in-c/9158263
 #define RESET   "\033[0m"
