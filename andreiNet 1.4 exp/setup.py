@@ -55,8 +55,7 @@ setup(
     description='Python bindings for andreiNET',
     long_description='', # Optional long description
     ext_modules=ext_modules,
-    # --- REMOVED cmdclass line ---
-    # cmdclass={'build_ext': pybind11.build_ext}, # <-- This line was removed
+    # --- NO cmdclass line ---
     zip_safe=False, # Recommended for C extensions
     python_requires='>=3.6', # Specify minimum Python version
 )

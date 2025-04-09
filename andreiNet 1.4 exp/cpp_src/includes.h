@@ -14,7 +14,7 @@
 #include <fstream> // For file I/O (use outside critical loops)
 #include <algorithm> // For std::max, std::min
 #include <map>       // For TextTable alignment
-#include "../eigen/Eigen/Core" // Include Eigen library header (adjust path if needed)
+#include "../../eigen/Eigen/Core" // Include Eigen library header (adjust path if needed)
 #include "TextTable.h" // Keep TextTable include
 
 
