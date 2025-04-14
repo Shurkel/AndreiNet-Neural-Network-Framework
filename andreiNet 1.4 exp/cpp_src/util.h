@@ -330,7 +330,7 @@ public:
     }
 
 
-}; // End class Util
+}u; // End class Util
 
 // --- Global Accessor Function (Meyers' Singleton) ---
 // Provides a single, thread-safe (since C++11) instance of the Util class.
