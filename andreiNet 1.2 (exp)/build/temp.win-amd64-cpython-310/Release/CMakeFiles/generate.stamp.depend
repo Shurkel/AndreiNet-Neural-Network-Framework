@@ -1,0 +1,39 @@
+# CMake generation dependency list for this directory.
+A:/CMake/share/cmake-3.26/Modules/CMakeCInformation.cmake
+A:/CMake/share/cmake-3.26/Modules/CMakeCXXInformation.cmake
+A:/CMake/share/cmake-3.26/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake
+A:/CMake/share/cmake-3.26/Modules/CMakeCommonLanguageInclude.cmake
+A:/CMake/share/cmake-3.26/Modules/CMakeGenericSystem.cmake
+A:/CMake/share/cmake-3.26/Modules/CMakeInitializeConfigs.cmake
+A:/CMake/share/cmake-3.26/Modules/CMakeLanguageInformation.cmake
+A:/CMake/share/cmake-3.26/Modules/CMakeRCInformation.cmake
+A:/CMake/share/cmake-3.26/Modules/CMakeSystemSpecificInformation.cmake
+A:/CMake/share/cmake-3.26/Modules/CMakeSystemSpecificInitialize.cmake
+A:/CMake/share/cmake-3.26/Modules/CheckCXXCompilerFlag.cmake
+A:/CMake/share/cmake-3.26/Modules/CheckCXXSourceCompiles.cmake
+A:/CMake/share/cmake-3.26/Modules/Compiler/CMakeCommonCompilerMacros.cmake
+A:/CMake/share/cmake-3.26/Modules/Compiler/MSVC-C.cmake
+A:/CMake/share/cmake-3.26/Modules/Compiler/MSVC-CXX.cmake
+A:/CMake/share/cmake-3.26/Modules/Compiler/MSVC.cmake
+A:/CMake/share/cmake-3.26/Modules/FindPackageHandleStandardArgs.cmake
+A:/CMake/share/cmake-3.26/Modules/FindPackageMessage.cmake
+A:/CMake/share/cmake-3.26/Modules/FindPython.cmake
+A:/CMake/share/cmake-3.26/Modules/FindPython/Support.cmake
+A:/CMake/share/cmake-3.26/Modules/Internal/CheckCompilerFlag.cmake
+A:/CMake/share/cmake-3.26/Modules/Internal/CheckFlagCommonConfig.cmake
+A:/CMake/share/cmake-3.26/Modules/Internal/CheckSourceCompiles.cmake
+A:/CMake/share/cmake-3.26/Modules/Platform/Windows-MSVC-C.cmake
+A:/CMake/share/cmake-3.26/Modules/Platform/Windows-MSVC-CXX.cmake
+A:/CMake/share/cmake-3.26/Modules/Platform/Windows-MSVC.cmake
+A:/CMake/share/cmake-3.26/Modules/Platform/Windows.cmake
+A:/CMake/share/cmake-3.26/Modules/Platform/WindowsPaths.cmake
+B:/OneDrive/OneDrive - Colegiul National Samuel von Brukenthal/Desktop/PrjSclNN/andreiNet 1.2 (exp)/bindings/CMakeLists.txt
+B:/OneDrive/OneDrive - Colegiul National Samuel von Brukenthal/Desktop/PrjSclNN/andreiNet 1.2 (exp)/build/temp.win-amd64-cpython-310/Release/CMakeFiles/3.26.2/CMakeCCompiler.cmake
+B:/OneDrive/OneDrive - Colegiul National Samuel von Brukenthal/Desktop/PrjSclNN/andreiNet 1.2 (exp)/build/temp.win-amd64-cpython-310/Release/CMakeFiles/3.26.2/CMakeCXXCompiler.cmake
+B:/OneDrive/OneDrive - Colegiul National Samuel von Brukenthal/Desktop/PrjSclNN/andreiNet 1.2 (exp)/build/temp.win-amd64-cpython-310/Release/CMakeFiles/3.26.2/CMakeRCCompiler.cmake
+B:/OneDrive/OneDrive - Colegiul National Samuel von Brukenthal/Desktop/PrjSclNN/andreiNet 1.2 (exp)/build/temp.win-amd64-cpython-310/Release/CMakeFiles/3.26.2/CMakeSystem.cmake
+B:/OneDrive/OneDrive - Colegiul National Samuel von Brukenthal/Desktop/PrjSclNN/andreiNet 1.2 (exp)/venv/Lib/site-packages/pybind11/share/cmake/pybind11/pybind11Common.cmake
+B:/OneDrive/OneDrive - Colegiul National Samuel von Brukenthal/Desktop/PrjSclNN/andreiNet 1.2 (exp)/venv/Lib/site-packages/pybind11/share/cmake/pybind11/pybind11Config.cmake
+B:/OneDrive/OneDrive - Colegiul National Samuel von Brukenthal/Desktop/PrjSclNN/andreiNet 1.2 (exp)/venv/Lib/site-packages/pybind11/share/cmake/pybind11/pybind11ConfigVersion.cmake
+B:/OneDrive/OneDrive - Colegiul National Samuel von Brukenthal/Desktop/PrjSclNN/andreiNet 1.2 (exp)/venv/Lib/site-packages/pybind11/share/cmake/pybind11/pybind11NewTools.cmake
+B:/OneDrive/OneDrive - Colegiul National Samuel von Brukenthal/Desktop/PrjSclNN/andreiNet 1.2 (exp)/venv/Lib/site-packages/pybind11/share/cmake/pybind11/pybind11Targets.cmake

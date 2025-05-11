@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="B:\OneDrive\OneDrive - Colegiul National Samuel von Brukenthal\Desktop\PrjSclNN\andreiNet 1.2 (exp)\bindings\bindings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="B:\OneDrive\OneDrive - Colegiul National Samuel von Brukenthal\Desktop\PrjSclNN\andreiNet 1.2 (exp)\bindings\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{85BB60F7-CB73-36CE-8222-C885ECAB613A}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

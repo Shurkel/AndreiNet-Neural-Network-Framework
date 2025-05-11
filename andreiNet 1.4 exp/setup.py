@@ -49,9 +49,9 @@ ext_modules = [
 
 setup(
     name='andreinet_bindings',
-    version='1.3.0', # Match your library version
-    author='Your Name', # Replace with your name
-    author_email='your_email@example.com', # Replace with your email
+    version='1.4.0', # Match your library version
+    author='Andrei Roman', # Replace with your name
+    author_email='roman_andrei12@yahoo.com', # Replace with your email
     description='Python bindings for andreiNET',
     long_description='', # Optional long description
     ext_modules=ext_modules,

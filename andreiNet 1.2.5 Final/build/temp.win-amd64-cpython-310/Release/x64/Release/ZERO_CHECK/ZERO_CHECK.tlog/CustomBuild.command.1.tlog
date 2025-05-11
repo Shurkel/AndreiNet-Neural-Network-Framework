@@ -1,0 +1,10 @@
+^X:\TST\ANDREINET 1.2.5 FINAL\BUILD\TEMP.WIN-AMD64-CPYTHON-310\RELEASE\CMAKEFILES\4ECE49CF741229C0FC90C249CDCFA142\GENERATE.STAMP.RULE
+setlocal
+A:\CMake\bin\cmake.exe "-SX:/tst/andreiNet 1.2.5 Final/bindings" "-BX:/tst/andreiNet 1.2.5 Final/build/temp.win-amd64-cpython-310/Release" --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file "X:/tst/andreiNet 1.2.5 Final/build/temp.win-amd64-cpython-310/Release/andreinet_py.sln"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

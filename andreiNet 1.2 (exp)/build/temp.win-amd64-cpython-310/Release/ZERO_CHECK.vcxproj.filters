@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="B:\OneDrive\OneDrive - Colegiul National Samuel von Brukenthal\Desktop\PrjSclNN\andreiNet 1.2 (exp)\build\temp.win-amd64-cpython-310\Release\CMakeFiles\305e8a16a9a3ec5afc5158e055de08a9\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{27A4DDA7-CDED-3E50-9C30-0E2032FF3517}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

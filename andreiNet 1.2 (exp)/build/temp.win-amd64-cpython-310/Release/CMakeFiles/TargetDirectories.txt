@@ -1,0 +1,3 @@
+B:/OneDrive/OneDrive - Colegiul National Samuel von Brukenthal/Desktop/PrjSclNN/andreiNet 1.2 (exp)/build/temp.win-amd64-cpython-310/Release/CMakeFiles/andreinet_py.dir
+B:/OneDrive/OneDrive - Colegiul National Samuel von Brukenthal/Desktop/PrjSclNN/andreiNet 1.2 (exp)/build/temp.win-amd64-cpython-310/Release/CMakeFiles/ALL_BUILD.dir
+B:/OneDrive/OneDrive - Colegiul National Samuel von Brukenthal/Desktop/PrjSclNN/andreiNet 1.2 (exp)/build/temp.win-amd64-cpython-310/Release/CMakeFiles/ZERO_CHECK.dir

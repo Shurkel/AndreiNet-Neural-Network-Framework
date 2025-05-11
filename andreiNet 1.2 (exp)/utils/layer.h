@@ -165,20 +165,27 @@ public:
             return;
         }
 
-        for (Node& currentNode : nodes) { // Iterate nodes in *this* layer (j)
-            double z = 0.0; // Accumulate weighted sum (pre-activation value)
-
-            // Sum inputs from previous layer (i)
-            for (const Node& prevNode : prev->nodes) { // Iterate nodes in previous layer
-                 // Need weight FROM prevNode TO currentNode
-                 // This requires prevNode storing weights to *its* next layer (which is this layer)
-                 // Access weight from prevNode's connection list
-                 z += prevNode.value * prevNode.getWeightTo(&currentNode); // Use activated value 'a' from previous layer
+        for (size_t j = 0; j < nodes.size(); ++j) { // Iterate nodes in *this* layer by index j
+            Node& currentNode = nodes[j];
+            double z_sum = 0.0; // Accumulate weighted sum
+    
+            for (const Node& prev_node : prev->nodes) { // Iterate nodes in previous layer (i)
+                // Weight from prev_node to currentNode (which is nodes[j])
+                // is stored in prev_node.next[j].weight
+                // This assumes prev_node.next is ordered by the target node's index.
+                if (j < prev_node.next.size()) { // Boundary check
+                    z_sum += prev_node.value * prev_node.next[j].weight;
+                } else {
+                    // This case should ideally not happen if layers are correctly connected.
+                    // Indicates a mismatch in expected connections.
+                    std::cerr << "Warning: Connection missing or index out of bounds in Layer::calculateActivations for L:" 
+                              << layerId << " N:" << j << " from prev L:" << prev->layerId << std::endl;
+                }
             }
-
-            z += currentNode.bias; // Add bias
-            currentNode.unactivatedValue = z;
-            currentNode.value = currentNode.activate(z); // Calculate activated value 'a'
+    
+            z_sum += currentNode.bias;
+            currentNode.unactivatedValue = z_sum;
+            currentNode.value = currentNode.activate(z_sum);
         }
     }
 

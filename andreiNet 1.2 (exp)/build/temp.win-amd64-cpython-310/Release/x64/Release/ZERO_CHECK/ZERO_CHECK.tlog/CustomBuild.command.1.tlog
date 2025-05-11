@@ -1,0 +1,10 @@
+^B:\ONEDRIVE\ONEDRIVE - COLEGIUL NATIONAL SAMUEL VON BRUKENTHAL\DESKTOP\PRJSCLNN\ANDREINET 1.2 (EXP)\BUILD\TEMP.WIN-AMD64-CPYTHON-310\RELEASE\CMAKEFILES\305E8A16A9A3EC5AFC5158E055DE08A9\GENERATE.STAMP.RULE
+setlocal
+A:\CMake\bin\cmake.exe "-SB:/OneDrive/OneDrive - Colegiul National Samuel von Brukenthal/Desktop/PrjSclNN/andreiNet 1.2 (exp)/bindings" "-BB:/OneDrive/OneDrive - Colegiul National Samuel von Brukenthal/Desktop/PrjSclNN/andreiNet 1.2 (exp)/build/temp.win-amd64-cpython-310/Release" --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file "B:/OneDrive/OneDrive - Colegiul National Samuel von Brukenthal/Desktop/PrjSclNN/andreiNet 1.2 (exp)/build/temp.win-amd64-cpython-310/Release/andreinet_py.sln"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

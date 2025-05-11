@@ -10,6 +10,7 @@
 #include <numeric>   // For std::accumulate
 #include <limits>    // For numeric_limits
 #include <algorithm> // For std::max, std::min
+#include <functional> // For std::function
 
 // Forward declaration (if needed, though Layer includes Node)
 // class Layer;
@@ -24,6 +25,7 @@ using TrainingSet = std::vector<TrainingPair>;
 class Net
 { // Renamed class to follow convention
 public:
+    using ProgressCallback = std::function<void(int, double, double, double, bool)>;
     std::vector<Layer> layers;
     // std::vector<double> expected; // Store expected values per-example, not in the Net object
     // std::vector<double> costs;    // Calculate costs per-example
@@ -162,7 +164,7 @@ public:
     }
 
     // Perform a full forward pass
-    const std::vector<double> &predict(const InputData &inputValues)
+    const std::vector<double> predict(const InputData &inputValues)
     {
         setInput(inputValues);
 
@@ -189,7 +191,7 @@ public:
     }
 
     // Get the output of the last layer *after* predict() has been called
-    const std::vector<double> &getOutput() const
+    const std::vector<double> getOutput() const
     {
         if (layers.empty())
         {
@@ -379,12 +381,14 @@ public:
         }
     } // End backPropagate
 
-    // --- Training Loop ---
-    void train(const TrainingSet &trainingData, int epochs, double learningRate, int batchSize = 1, bool shuffle = true)
+    // --- Training Loop (Modified) ---
+    void train(const TrainingSet &trainingData, int epochs, double learningRate, int batchSize = 1, bool shuffle = true, ProgressCallback progressCb = nullptr)
     {
         if (layers.empty())
         {
             std::cerr << "Error: Cannot train an empty network." << std::endl;
+            if (progressCb)
+                progressCb(-1, -1, -1, -1, true); // Signal error/completion
             return;
         }
 
@@ -392,26 +396,29 @@ public:
         if (n_samples == 0)
         {
             std::cerr << "Warning: Training data is empty." << std::endl;
+            if (progressCb)
+                progressCb(-1, -1, -1, -1, true); // Signal error/completion
             return;
         }
         if (batchSize <= 0)
             batchSize = 1;
-        if (batchSize > n_samples)
-            batchSize = n_samples;
-
-        size_t n_batches = (n_samples + batchSize - 1) / batchSize; // Ceiling division
+        // Note: Current backPropagate updates weights per sample (SGD).
+        // True mini-batch would accumulate gradients. For simplicity, we keep SGD behaviour.
+        // The batchSize variable here is not fully utilized for gradient accumulation.
 
         std::vector<size_t> indices(n_samples);
-        std::iota(indices.begin(), indices.end(), 0); // Fill with 0, 1, ..., n_samples-1
+        std::iota(indices.begin(), indices.end(), 0);
 
-        std::ofstream loss_log("training_loss.txt"); // Log loss to file
+        // std::ofstream loss_log("training_loss.txt"); // Logging to file can be optional
 
-        Timer epochTimer; // Time epochs
+        Timer epochTimer;
 
-        std::cout << "Starting training...\n"
-                  << "Epochs: " << epochs << ", Learning Rate: " << learningRate
-                  << ", Batch Size: " << batchSize << ", Samples: " << n_samples
-                  << ", Batches/Epoch: " << n_batches << std::endl;
+        if (!progressCb)
+        { // Only print to cout if no callback is provided
+            std::cout << "Starting training...\n"
+                      << "Epochs: " << epochs << ", Learning Rate: " << learningRate
+                      << ", Samples: " << n_samples << std::endl;
+        }
 
         for (int e = 0; e < epochs; ++e)
         {
@@ -421,55 +428,71 @@ public:
 
             if (shuffle)
             {
-                // std::shuffle(indices.begin(), indices.end(), u.rng); // Error: rng is inaccessible
-                std::shuffle(indices.begin(), indices.end(), u.getRng()); // Correct: Use the public getter
+                std::shuffle(indices.begin(), indices.end(), u.getRng());
             }
-
-            // --- Batch processing would go here ---
-            // For simplicity, this uses SGD (batchSize=1 implicitly if not modified)
-            // To implement batches:
-            // 1. Loop through batches.
-            // 2. For each batch:
-            //    a. Accumulate weight/bias gradients over samples in the batch.
-            //    b. After processing the batch, update weights/biases using accumulated gradients / batchSize.
-            // This example sticks to SGD (update after each sample) for now.
 
             for (size_t i = 0; i < n_samples; ++i)
             {
-                const TrainingPair &currentSample = trainingData[indices[i]]; // Use shuffled index
-
-                // Run backpropagation and update weights for this single sample
+                const TrainingPair& currentSample = trainingData[indices[i]];
                 backPropagate(currentSample, learningRate);
-
-                // Accumulate loss for reporting (optional, can slow down if done every sample)
                 epochSSR += calculateSSR(currentSample.second);
                 epochCE += calculateCrossEntropy(currentSample.second);
-
-            } // End loop through samples
+            }
 
             averageSSR = epochSSR / n_samples;
             averageCrossEntropy = epochCE / n_samples;
-            epochTimer.stop(false); // Stop timer without printing yet
+            epochTimer.stop(false);
 
-            // Print progress periodically
-            if ((e + 1) % 10 == 0 || e == 0 || e == epochs - 1)
+            if (progressCb)
             {
-                std::cout << "Epoch [" << (e + 1) << "/" << epochs << "] "
-                          << "Avg SSR: " << std::fixed << std::setprecision(6) << averageSSR << " | "
-                          << "Avg CE: " << std::fixed << std::setprecision(6) << averageCrossEntropy << " | "
-                          << "Time: " << std::fixed << std::setprecision(2) << epochTimer.getDurationMs() << " ms"
-                          << std::endl;
+                progressCb(e + 1, averageSSR, averageCrossEntropy, epochTimer.getDurationMs(), (e == epochs - 1));
             }
-            loss_log << (e + 1) << "\t" << averageSSR << "\t" << averageCrossEntropy << "\n";
+            else
+            {
+                if ((e + 1) % 10 == 0 || e == 0 || e == epochs - 1)
+                {
+                    std::cout << "Epoch [" << (e + 1) << "/" << epochs << "] "
+                              << "Avg SSR: " << std::fixed << std::setprecision(6) << averageSSR << " | "
+                              << "Avg CE: " << std::fixed << std::setprecision(6) << averageCrossEntropy << " | "
+                              << "Time: " << std::fixed << std::setprecision(2) << epochTimer.getDurationMs() << " ms"
+                              << std::endl;
+                }
+            }
+            // loss_log << (e + 1) << "\t" << averageSSR << "\t" << averageCrossEntropy << "\n";
+        }
 
-        } // End loop through epochs
-
-        std::cout << "Training finished.\n";
-        loss_log.close();
-
-    } // End train
+        if (!progressCb)
+        {
+            std::cout << "Training finished.\n";
+        }
+        // loss_log.close();
+    }
 
     // --- Printing & Debugging ---
+    std::string getNetworkStructureString() const {
+        std::ostringstream oss;
+        oss << "> Network Structure " << std::string(10, '-') << '\n';
+        oss << "| Layers: " << layers.size() << '\n';
+        for (size_t i = 0; i < layers.size(); ++i) {
+            const auto& layer = layers[i];
+            oss << "| L" << layer.layerId << ": " << layer.nodes.size() << " nodes";
+            if (!layer.nodes.empty()) {
+                int actFunc = layer.nodes[0].activationFunction; // Assume uniform activation
+                std::string actStr = "Linear";
+                if (actFunc == 0) actStr = "ReLU";
+                else if (actFunc == 1) actStr = "Sigmoid";
+                else if (actFunc == 2) actStr = "Softplus";
+                oss << " (Act: " << actStr << ")";
+            }
+            if (layer.next) {
+                oss << " --> L" << layer.next->layerId;
+            }
+            oss << '\n';
+        }
+        oss << std::string(28, '-') << '\n';
+        return oss.str();
+    }
+    
 
     void printNetworkStructure() const
     {
@@ -545,6 +568,7 @@ public:
             std::cerr << "Error: Invalid layer ID for printing node: " << layerId << std::endl;
         }
     }
+    const std::vector<Layer>& getLayers() const { return layers; }
 
     // --- Deprecated / Old Functions (Keep or remove) ---
     /*

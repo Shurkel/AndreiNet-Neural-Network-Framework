@@ -4,6 +4,10 @@ import os
 import numpy as np
 import traceback
 import math
+try:
+    import matplotlib.pyplot as plt  # ADDED for plotting comparison
+except ImportError:
+    plt = None  # Flag if matplotlib is missing
 
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QFormLayout,
@@ -110,7 +114,7 @@ class AndreiNetApp(QMainWindow):
         data_load_group.setLayout(data_load_layout); right_layout.addWidget(data_load_group)
         self.data_prep_group = QGroupBox("Data Preprocessing"); self.data_prep_group.setEnabled(False)
         prep_layout = QFormLayout(); self.norm_combo = QComboBox(); self.norm_combo.addItems(["None", "MinMax (0 to 1)", "MinMax (-1 to 1)"]); self.norm_combo.setToolTip("Normalize feature values (applied after splitting)")
-        self.split_spin = QDoubleSpinBox(); self.split_spin.setRange(0.0, 0.95); self.split_spin.setValue(0.2); self.split_spin.setDecimals(2); self.split_spin.setSingleStep(0.05); self.split_spin.setToolTip("Percentage of data to hold out for validation (0 = use all for training)")
+        self.split_spin = QDoubleSpinBox(); self.split_spin.setRange(0.0, 0.95); self.split_spin.setValue(0.0); self.split_spin.setDecimals(2); self.split_spin.setSingleStep(0.05); self.split_spin.setToolTip("Percentage of data to hold out for validation (0 = use all for training)")
         self.split_shuffle_checkbox = QCheckBox("Shuffle Before Split"); self.split_shuffle_checkbox.setChecked(True); self.split_shuffle_checkbox.setToolTip("Randomly shuffle data before splitting into train/validation sets")
         self.prepare_data_button = QPushButton("Prepare Data (Split & Normalize)"); self.prepare_data_button.setToolTip("Apply splitting and normalization to the loaded data"); self.prepare_data_button.clicked.connect(self.prepare_data)
         self.prep_status_label = QLabel("Status: Data not prepared."); self.prep_status_label.setObjectName("StatusLabel"); self.prep_status_label.setWordWrap(True)
@@ -490,6 +494,7 @@ class AndreiNetApp(QMainWindow):
     def on_training_finished(self):
         self.is_training = False; self._update_ui_state(); self.statusBar.showMessage("Training finished.", 5000); self.results_text.append("--- Training Complete ---")
         if os.path.exists("training_loss_eigen.txt"): self.plot_loss_button.setEnabled(True)
+
         else: self.log_message("Training finished, but loss log missing.", is_error=True)
 
     @pyqtSlot(tuple)
@@ -552,6 +557,11 @@ class AndreiNetApp(QMainWindow):
         self.results_text.append(f"\n--- Output Comparison ({data_label}) ---")
         output_size = self.current_net.get_layer_nodes(self.current_net.get_layer_count() - 1)
 
+        # --- ADDED: Lists to store data for plotting ---
+        all_targets = []
+        all_predictions = []
+        # --- END ADDED ---
+
         try:
             line_format = "{:<5} | {:<25} | {:<15} | {:<15} | {:<8}"
             self.results_text.append(line_format.format("Idx", "Input Features", "Target", "Prediction", "Result"))
@@ -563,6 +573,11 @@ class AndreiNetApp(QMainWindow):
                 features_np = np.asarray(features)
                 target_np = np.asarray(target)
                 prediction_np = np.asarray(prediction)
+
+                # --- ADDED: Append data for plotting ---
+                all_targets.append(target_np)
+                all_predictions.append(prediction_np)
+                # --- END ADDED ---
 
                 # Format for display (limit precision)
                 f_str = ", ".join([f"{f:.2f}" for f in features_np])
@@ -581,12 +596,59 @@ class AndreiNetApp(QMainWindow):
             self.log_message(f"Finished comparing outputs for {data_label}.")
             self.statusBar.showMessage(f"Displayed output comparison for {data_label}.", 4000)
 
+            # --- ADDED: Call plotting function ---
+            self._plot_comparison(all_targets, all_predictions, data_label, output_size)
+            # --- END ADDED ---
+
         except Exception as e:
             self.log_message(f"Error during output comparison: {e}\n{traceback.format_exc()}", is_error=True)
             QMessageBox.critical(self, "Comparison Error", f"An error occurred during comparison: {e}")
     # --- END ADDED Compare Method ---
 
-    # predict_single remains the same
+    # --- ADDED Plotting Helper Method ---
+    def _plot_comparison(self, targets, predictions, data_label, output_size):
+        """Generates a plot comparing targets and predictions."""
+        if plt is None:
+            self.log_message("Matplotlib not found. Cannot generate comparison plot. Install: pip install matplotlib", is_error=True)
+            QMessageBox.warning(self, "Plotting Error", "Matplotlib is required for plotting.\nPlease install it: pip install matplotlib")
+            return
+
+        if output_size != 1:
+            self.log_message(f"Comparison plotting is only implemented for single-output networks (output_size={output_size}). Skipping plot.")
+            return
+
+        try:
+            # Ensure data is in a plottable format (e.g., flatten lists of single-element arrays)
+            targets_flat = [t[0] for t in targets if len(t) == 1]
+            predictions_flat = [p[0] for p in predictions if len(p) == 1]
+            indices = range(len(targets_flat))
+
+            if not targets_flat or len(targets_flat) != len(predictions_flat):
+                 self.log_message("Data format error for plotting.", is_error=True)
+                 return
+
+            plt.figure(figsize=(12, 6))  # Create a new figure
+            plt.plot(indices, targets_flat, 'bo-', label='Target', markersize=5)
+            plt.plot(indices, predictions_flat, 'rx--', label='Prediction', markersize=5)
+
+            # Add threshold line for binary classification visualization
+            if all(t == 0 or t == 1 for t in targets_flat):  # Check if likely binary targets
+                 plt.axhline(0.5, color='gray', linestyle=':', linewidth=1, label='Threshold (0.5)')
+
+            plt.xlabel("Sample Index")
+            plt.ylabel("Value")
+            plt.title(f"Target vs. Prediction Comparison ({data_label})")
+            plt.legend()
+            plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+            plt.tight_layout()
+            plt.show()  # Show the plot (non-blocking by default in some backends)
+            self.log_message(f"Generated comparison plot for {data_label}.")
+
+        except Exception as e:
+            self.log_message(f"Error generating comparison plot: {e}\n{traceback.format_exc()}", is_error=True)
+            QMessageBox.critical(self, "Plotting Error", f"An error occurred while generating the plot: {e}")
+    # --- END ADDED Plotting Helper Method ---
+
     def predict_single(self):
         if not self.current_net: return
         input_str = self.predict_input.text().strip(); self.log_message(f"Predicting for input: '{input_str}'"); self.results_text.append(f"\n--- Single Prediction ---"); self.results_text.append(f"Input String: {input_str}")
